@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <title>Mastermind</title>
+
+        <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+        <!-- <link rel="icon" type="image/png" sizes="174x174" href="./style/favicon.png"> -->
+        <!-- <link rel="stylesheet" type="text/css" href="./style/examples.css"> -->
+
+        <script>
+
+            var cfg = {
+                bases: ['A', 'T', 'C', 'G'],
+                num: 6,
+                //resultBothChar: '#',
+                //resultTypeChar: '+'
+                resultBothChar: '✅',
+                resultTypeChar: '☑️'
+                //resultTypeChar: '️'
+            }
+
+            var solution = [];
+
+            function getRandomBase () {
+                max = cfg.bases.length;
+                min = 0;
+                return cfg.bases[Math.floor(Math.random() * (max - min)) + min];
+            }
+
+            function generate () {
+                
+                clearSolution();
+                clearGuesses();
+
+                for (var i = 0; i < cfg.num; i++) {
+                    solution.push(getRandomBase());
+                }
+
+                solutionLabel.innerHTML = solution;
+
+                //console.log(solution);
+            }
+
+            function clearSolution () {
+                solution = [];
+            }
+
+            function clearGuesses () {
+                while (pastGuesses.lastChild) {
+                    pastGuesses.removeChild(pastGuesses.lastChild);
+                }
+            }
+
+            function guess () {
+
+                var guessArray = guessText.value.split('');
+                var solutionArray = solution.slice();
+
+                var resultBoth = 0;
+                var resultType = 0;
+
+                //console.log('TESTING PLACE AND TYPE');
+                var i = 0;
+                while (
+                    guessArray.length > 0 &&
+                    solutionArray.length > 0 &&
+                    i < guessArray.length &&
+                    i < solutionArray.length)
+                {
+                    //console.log(solutionArray);
+                    //console.log(guessArray);
+                    //console.log('i:', i, 'guess:', guessArray[i], 'solution:', solutionArray[i]);
+
+                    if (guessArray[i] == solutionArray[i]) {
+                        resultBoth += 1;
+                        guessArray.splice(i, 1);
+                        solutionArray.splice(i, 1);
+                    } else {
+                        i++;
+                    }
+                }
+
+                //console.log('TESTING TYPE ONLY');
+                for (var j = guessArray.length - 1; j >= 0; j--)
+                {
+                    //console.log(solutionArray);
+                    //console.log(guessArray);
+
+                    var found = solutionArray.indexOf(guessArray[j]);
+                    if (found > -1) {
+                        resultType += 1;
+                        solutionArray.splice(found, 1);
+                    }
+                }
+
+                var resultStr = "";
+                for (var k = 0; k < resultBoth; k++) {
+                    resultStr += cfg.resultBothChar;
+                }
+                for (var l = 0; l < resultType; l++) {
+                    resultStr += cfg.resultTypeChar;
+                }
+                //resultLabel.innerHTML = "both: " + resultBoth + ", type: " + resultType;
+                resultLabel.innerHTML = resultStr;
+
+
+
+                var li = document.createElement("li");
+                li.innerHTML = "guess: " + guessText.value + ", result: " + resultStr;
+                  
+                //Add li to the end of the list
+                pastGuesses.appendChild(li);
+            }
+        </script>
+
+    </head>
+
+    <body onload="generate()">
+
+        Solution: <span id="solutionLabel"></span><br>
+        Guess: <input type="text" name="guessInput" id="guessText"><br>
+        Result: <span id="resultLabel"></span><br>
+  
+        <input type="button" name="generateButton" value="Generate" onclick="generate()">
+        <input type="button" name="guessButton" value="Guess" onclick="guess()">
+        <br>
+
+        Past Guesses:<br>
+        <ul id="pastGuesses">
+        </ul>
+
+    </body>
+
+</html>
